@@ -55,10 +55,11 @@ export default function Screen({ id, t }) {
         <p className="text-sm text-ink/65">@namuna_tech</p>
         <p className="mt-1 text-2xl font-black tracking-tight">{som(PRICE)} <span className="text-base">{t.cur}</span></p>
       </div>
-      <Line>{s.method}</Line>
-      <div className="grid grid-cols-2 gap-2 text-sm font-bold">
-        <span className="rounded-xl border-2 border-ink bg-ink py-3 text-center text-paper">Click</span>
-        <span className="rounded-xl border-2 border-ink bg-white py-3 text-center">Payme</span>
+      <div className="rounded-xl border-2 border-ink bg-ink px-4 py-2.5 text-paper">
+        <p className="flex items-baseline justify-between gap-2 text-sm font-bold">
+          {s.card}<span className="text-xs tracking-wider whitespace-nowrap">•••• ••••</span>
+        </p>
+        <p className="mt-1 text-[11px] leading-snug text-paper/70">{s.cardHint}</p>
       </div>
       <p className="flex items-center gap-2 rounded-xl border-2 border-ink bg-mint px-3 py-2.5 text-xs font-bold"><ShieldCheck className="size-4" />{s.safe}</p>
       <Button className="bg-accent">{s.pay}</Button>

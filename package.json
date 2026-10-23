@@ -4,9 +4,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "server": "node --env-file-if-exists=.env server/index.js",
+    "admin": "node --env-file-if-exists=.env server/seed.js",
+    "seed:demo": "node --env-file-if-exists=.env server/seed.js --demo",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node --test \"src/**/*.test.js\""
+    "test": "node --test \"server/**/*.test.js\" \"src/**/*.test.js\"",
+    "click:sim": "node --env-file-if-exists=.env server/click-sim.js"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
@@ -21,5 +25,8 @@
     "@vitejs/plugin-react": "^6.1.2",
     "tailwindcss": "^4.3.3",
     "vite": "^8.3.5"
+  },
+  "engines": {
+    "node": ">=22.13"
   }
 }

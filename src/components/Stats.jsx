@@ -3,7 +3,7 @@ import { gsap, useGSAP, MQ } from '../lib/motion'
 import { CHANNELS_COUNT } from '../config'
 
 // Only facts from the business model; the channel count stays a placeholder until real.
-const VALUES = [[CHANNELS_COUNT, ''], ['24', ''], ['15', '%', '10–'], ['2', '']]
+const VALUES = [[CHANNELS_COUNT, ''], ['24', ''], ['15', '%', '10–'], ['100', '%']]
 
 export default function Stats({ t }) {
   const root = useRef(null)

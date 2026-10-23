@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Megaphone, Menu, X } from 'lucide-react'
-import { BRAND, botUrl } from '../config'
+import { BRAND, HAS_BOT, botUrl } from '../config'
 import { Link } from '../lib/router'
 
 export function Logo({ label }) {
@@ -55,7 +55,7 @@ export default function Header({ t, lang, setLang, path }) {
               </button>
             ))}
           </div>
-          <a href={botUrl()} className="btn btn-primary hidden px-4 py-2 text-sm sm:inline-flex">{t.openBot}</a>
+          <a href={botUrl()} className="btn btn-primary hidden px-4 py-2 text-sm sm:inline-flex">{HAS_BOT ? t.openBot : t.writeUs}</a>
           <button
             type="button"
             aria-label={t.menu}
@@ -74,7 +74,7 @@ export default function Header({ t, lang, setLang, path }) {
           <ul className="divide-y-2 divide-ink/15">
             {links('block py-4 text-2xl font-black tracking-tight decoration-brand decoration-4 underline-offset-[6px] aria-[current=page]:underline')}
           </ul>
-          <a href={botUrl()} className="btn btn-primary mt-4 w-full sm:hidden">{t.openBot}</a>
+          <a href={botUrl()} className="btn btn-primary mt-4 w-full sm:hidden">{HAS_BOT ? t.openBot : t.writeUs}</a>
         </nav>
       )}
     </header>

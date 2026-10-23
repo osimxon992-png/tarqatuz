@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, MQ } from '../lib/motion'
-import { botUrl } from '../config'
+import { HAS_BOT, botUrl } from '../config'
 
 export default function FinalCta({ t }) {
   const root = useRef(null)
@@ -25,7 +25,7 @@ export default function FinalCta({ t }) {
           </h2>
           <p className="mx-auto mt-6 max-w-xl text-lg font-medium">{t.cta.sub}</p>
           <a href={botUrl()} className="btn mt-10 bg-ink px-8 py-4 text-base text-paper shadow-[5px_5px_0_var(--color-brand)] hover:shadow-[7px_7px_0_var(--color-brand)]">
-            {t.openBot}
+            {HAS_BOT ? t.openBot : t.writeUs}
           </a>
         </div>
       </div>
