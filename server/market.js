@@ -22,14 +22,15 @@ function cleanReason(action, reason) {
 
 export function createChannel(db, c, now = Date.now()) {
   const { lastInsertRowid } = db.prepare(`
-    INSERT INTO channels (username, title, category, subscribers, avg_views, price, owner, status, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
-    .run(c.username, c.title, c.category, c.subscribers, c.avgViews, c.price, c.owner, now)
+    INSERT INTO channels (username, title, category, subscribers, avg_views, price, owner, tg_chat_id, owner_tg, status, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?)`)
+    .run(c.username, c.title, c.category, c.subscribers, c.avgViews, c.price, c.owner, c.tgChatId ?? null, c.ownerTg ?? null, now)
   return Number(lastInsertRowid)
 }
 
 // Fee and payout are fixed when the advertiser pays, so a later commission change can't alter old orders.
-export function createOrder(db, { channelId, advertiser, price, commissionPct, by }, now = Date.now()) {
+// tg: the bot's Telegram fields ({ advertiserTg, adChat, adMsg }); orders made in the admin panel have none.
+export function createOrder(db, { channelId, advertiser, price, commissionPct, by, tg = {} }, now = Date.now()) {
   if (typeof advertiser !== 'string' || !advertiser.trim() || advertiser.length > 64) throw new ActionError('Reklama beruvchini yozing', 400)
   if (!Number.isInteger(price) || price <= 0) throw new ActionError('Narx notoʻgʻri', 400)
   if (!Number.isInteger(commissionPct) || commissionPct < COMMISSION[0] || commissionPct > COMMISSION[1]) throw new ActionError('Komissiya 10–15% boʻlishi kerak', 400)
@@ -37,9 +38,9 @@ export function createOrder(db, { channelId, advertiser, price, commissionPct, b
   if (channel?.status !== 'verified') throw new ActionError('Kanal tekshirilmagan', 400)
   const { fee, payout } = split(price, commissionPct)
   const { lastInsertRowid } = db.prepare(`
-    INSERT INTO orders (channel_id, advertiser, price, commission_pct, fee, payout, created_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?)`)
-    .run(channelId, advertiser.trim(), price, commissionPct, fee, payout, now)
+    INSERT INTO orders (channel_id, advertiser, price, commission_pct, fee, payout, advertiser_tg, ad_chat, ad_msg, created_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+    .run(channelId, advertiser.trim(), price, commissionPct, fee, payout, tg.advertiserTg ?? null, tg.adChat ?? null, tg.adMsg ?? null, now)
   const id = Number(lastInsertRowid)
   if (by) audit(db, by, 'create', 'order', id, null, now)
   return id

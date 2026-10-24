@@ -18,6 +18,7 @@ import Pricing from './components/Pricing'
 import Faq from './components/Faq'
 import FinalCta from './components/FinalCta'
 import Footer from './components/Footer'
+import Privacy from './components/Privacy'
 
 const Home = ({ t }) => (
   <>
@@ -33,7 +34,7 @@ const Home = ({ t }) => (
 )
 
 // Paths match the hrefs in t.nav. Unknown paths fall back to the home page.
-const PAGES = { '/': Home, '/qanday-ishlaydi': HowItWorks, '/kanallar': Catalog, '/narxlar': Pricing, '/faq': Faq }
+const PAGES = { '/': Home, '/qanday-ishlaydi': HowItWorks, '/kanallar': Catalog, '/narxlar': Pricing, '/faq': Faq, '/maxfiylik': Privacy }
 const HOME_TITLE = document.title
 
 export default function App() {
@@ -44,7 +45,7 @@ export default function App() {
   const Page = PAGES[path] ?? Home
 
   useEffect(() => {
-    const label = t.nav.find(([href]) => href === path)?.[1]
+    const label = t.nav.find(([href]) => href === path)?.[1] ?? (path === '/maxfiylik' ? t.privacyPage.title : null)
     document.title = label ? `${label} — ${BRAND}` : HOME_TITLE
   }, [path, t])
 

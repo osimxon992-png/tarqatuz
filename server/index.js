@@ -3,12 +3,16 @@ import { openDb } from './db.js'
 import * as auth from './auth.js'
 import * as market from './market.js'
 import * as click from './click.js'
+import { startBot } from './bot.js'
+import * as tg from './tg.js'
 import { CHANNEL_STATUSES, ORDER_STATUSES, PAYOUT_STATUSES } from '../src/lib/rules.js'
 
 const db = openDb()
 const PORT = Number(process.env.PORT) || 8787
 const HOST = process.env.HOST || '127.0.0.1'
 const PROD = process.env.NODE_ENV === 'production'
+// Same process as the API, so the bot and the admin panel share one database writer.
+const bot = process.env.BOT_TOKEN ? startBot(db, process.env.BOT_TOKEN) : null
 
 function send(res, status, body, headers = {}) {
   res.writeHead(status, {
@@ -76,6 +80,21 @@ async function handle(req, res) {
     if (origin && URL.parse(origin)?.host !== req.headers.host) return send(res, 403, { error: 'Ruxsat yoʻq' })
   }
 
+  // Mini App inside the bot: the user is whoever Telegram's signed initData says, never a cookie.
+  if (path.startsWith('/api/tg/')) {
+    const user = tg.verifyInitData(req.headers['x-telegram-init-data'], process.env.BOT_TOKEN)
+    if (!user) return send(res, 401, { error: 'Ilovani Telegram ichida oching' })
+    if (!post && path === '/api/tg/catalog') return send(res, 200, tg.catalog(db))
+    if (!post && path === '/api/tg/me') return send(res, 200, tg.mine(db, user.id))
+    if (post && path === '/api/tg/order') {
+      const { channelId } = await readJson(req)
+      if (!bot) return send(res, 503, { error: 'Bot ishlamayapti' })
+      await bot.beginAd(user.id, Number(channelId))
+      return send(res, 200, { ok: true })
+    }
+    return send(res, 404, { error: 'Topilmadi' })
+  }
+
   if (post && path === '/api/login') {
     const ip = req.socket.remoteAddress
     if (auth.loginBlocked(ip)) return send(res, 429, { error: 'Juda koʻp urinish. 15 daqiqadan keyin qayta urinib koʻring' })
@@ -120,11 +139,15 @@ async function handle(req, res) {
   let m
   if (post && (m = path.match(/^\/api\/orders\/(\d+)$/))) {
     const { action, reason } = await readJson(req)
-    return send(res, 200, { status: market.orderAction(db, Number(m[1]), action, admin.username, reason) })
+    const status = market.orderAction(db, Number(m[1]), action, admin.username, reason)
+    bot?.orderChanged(Number(m[1]))
+    return send(res, 200, { status })
   }
   if (post && (m = path.match(/^\/api\/channels\/(\d+)$/))) {
     const { action, reason } = await readJson(req)
-    return send(res, 200, { status: market.channelAction(db, Number(m[1]), action, admin.username, reason) })
+    const status = market.channelAction(db, Number(m[1]), action, admin.username, reason)
+    bot?.channelChanged(Number(m[1]))
+    return send(res, 200, { status })
   }
   if (post && (m = path.match(/^\/api\/payouts\/(\d+)\/paid$/))) {
     return send(res, 200, { status: market.markPayoutPaid(db, Number(m[1]), admin.username) })

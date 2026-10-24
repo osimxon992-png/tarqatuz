@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react'
-import { Megaphone, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { BRAND, HAS_BOT, botUrl } from '../config'
 import { Link } from '../lib/router'
 
 export function Logo({ label }) {
   return (
     <Link to="/" aria-label={label} className="flex items-center gap-2.5 text-xl font-black tracking-tight">
-      <span className="grid size-10 place-items-center rounded-lg border-[3px] border-ink bg-brand text-ink">
-        <Megaphone className="size-5" strokeWidth={2.5} aria-hidden="true" />
-      </span>
+      <img src="/favicon.svg" alt="" className="size-10" />
       {BRAND}
     </Link>
   )

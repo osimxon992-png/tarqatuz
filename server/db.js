@@ -82,7 +82,22 @@ export function openDb(path = process.env.DB_PATH || DEFAULT_PATH) {
     );
   `)
   migrateOrdersStatus(db)
+  addBotColumns(db)
   return db
+}
+
+// Telegram ids the bot needs. Messages are copied from bot-sent copies, so what was approved is what gets posted.
+const BOT_COLUMNS = {
+  channels: ['tg_chat_id INTEGER', 'owner_tg INTEGER'],
+  // ad_*: advertiser's frozen preview; review_msg: the copy the owner approved; post_msg: the post in the channel.
+  orders: ['advertiser_tg INTEGER', 'ad_chat INTEGER', 'ad_msg INTEGER', 'review_msg INTEGER', 'post_msg INTEGER'],
+}
+
+function addBotColumns(db) {
+  for (const [table, cols] of Object.entries(BOT_COLUMNS)) {
+    const have = new Set(db.prepare(`PRAGMA table_info(${table})`).all().map((c) => c.name))
+    for (const col of cols) if (!have.has(col.split(' ')[0])) db.exec(`ALTER TABLE ${table} ADD COLUMN ${col}`)
+  }
 }
 
 // Databases made before Click support can't hold status 'new'; SQLite can't widen a CHECK in place,

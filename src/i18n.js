@@ -1,4 +1,5 @@
 import { MIN_SUBSCRIBERS } from './config'
+import { PRIVACY } from './privacy'
 
 const uz = {
   skip: 'Asosiy kontentga oʻtish',
@@ -310,4 +311,4 @@ const ru = {
   },
 }
 
-export const dict = { uz, ru }
+export const dict = { uz: { ...uz, privacyPage: PRIVACY.uz }, ru: { ...ru, privacyPage: PRIVACY.ru } }

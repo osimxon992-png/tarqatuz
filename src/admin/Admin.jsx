@@ -50,9 +50,7 @@ export default function Admin() {
     <div className="min-h-screen bg-paper text-ink md:grid md:grid-cols-[240px_1fr]">
       <aside data-dark className="flex flex-col bg-ink text-paper md:sticky md:top-0 md:h-screen">
         <div className="flex items-center gap-2.5 px-5 py-5">
-          <span className="grid size-9 place-items-center rounded-lg border-2 border-paper/30 bg-brand text-ink">
-            <Megaphone className="size-5" strokeWidth={2.5} aria-hidden="true" />
-          </span>
+          <img src="/favicon.svg" alt="" className="size-9" />
           <span className="text-xl font-black">tarqat</span>
           <span className="rounded-md bg-accent px-1.5 py-0.5 text-xs font-black text-ink">admin</span>
           <div className="ml-auto md:hidden">{logoutButton}</div>
